@@ -1,0 +1,12 @@
+.env
+venv/
+.venv/
+.scanners/
+__pycache__/
+runs/
+data/runs.json
+data/settings.json
+stream_events.db*
+.settings.key
+node_modules/
+package-lock.json

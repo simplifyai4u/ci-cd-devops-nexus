@@ -1,0 +1,32 @@
+# CIP DevSecOps platform – one EC2 / Linux host.
+#   cp cip-api/.env.example cip-api/.env   (fill in LLM keys, set environment="production", settings_secret_key)
+#   docker compose up -d --build
+# Open http://<host>/  (only port 80 is needed in the security group).
+#
+# Both services use the host network on purpose: the pipeline publishes the UAT apps it deploys on the host's
+# 127.0.0.1:<random port> and the API, Selenium and the scanners reach them there.
+services:
+  api:
+    build: ./cip-api
+    network_mode: host
+    restart: unless-stopped
+    env_file: ./cip-api/.env
+    environment:
+      cip_stream_db: /app/data/stream_events.db
+      start_mcp_servers: "true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # the pipeline builds / runs / scans images on the host daemon
+      - cip-data:/app/data                          # runs.json, settings.json, stream_events.db
+      - cip-runs:/app/runs                          # cloned repos, reports, artifacts
+    shm_size: "1gb"                                 # headless Chrome
+
+  web:
+    build: ./cip-app
+    network_mode: host                              # nginx on :80 -> 127.0.0.1:8000
+    restart: unless-stopped
+    depends_on:
+      - api
+
+volumes:
+  cip-data:
+  cip-runs:
