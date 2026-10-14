@@ -63,7 +63,8 @@ function SecuritySummary({ sm }) {
 /** Human in the loop: the run waits until a reviewer approves or rejects –
  *  the security reports (after the scans, both flows) or the UAT deploy (guided flow). */
 export default function ApprovalCard() {
-    const { run, resume } = usePipelineStore();
+    const run = usePipelineStore((s) => s.run);
+    const resume = usePipelineStore((s) => s.resume);
     const [by, setBy] = useState('');
     const [comment, setComment] = useState('');
     const [sending, setSending] = useState(false);
