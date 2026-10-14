@@ -172,6 +172,8 @@ class ContainerAgent:
             if not rebuilt["built"]:                 # never leave a broken image behind – undo this attempt
                 (folder / "Dockerfile").write_text(backup, encoding="utf-8")
                 image = await docker.call_tool("docker_build", {"context": str(folder), "tag": tag})
+                # keep what the later stages (deploy, release, report) read from the image record
+                image.update(port=port, dockerfile_source=source, dockerfile=backup)
                 heal += "\n(the hardened Dockerfile did not build – reverted to the previous one)"
                 continue
             port = exposed_port(folder, port)

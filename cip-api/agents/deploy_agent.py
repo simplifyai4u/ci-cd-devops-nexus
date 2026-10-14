@@ -140,7 +140,8 @@ class DeployAgent:
             name, attempt = svc["component"], 0
             folder = Path(state["workspace"]) / comps.get(name, {}).get("path", ".")
             image = dict(images[name])
-            tools = WorkspaceTools(state["workspace"], state["task_id"], self.node_name)
+            image.setdefault("port", 8080)       # same default as run(); an image record without a port must not crash the heal
+            tools =WorkspaceTools(state["workspace"], state["task_id"], self.node_name)
             while services[i]["status"] != "passed" and attempt < tries:
                 attempt += 1
                 await emit(state["task_id"], self.node_name, StreamStatus.PROGRESS,
